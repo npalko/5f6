@@ -1,64 +1,69 @@
+
+#include <cstdint>
+#include <string>
+#include <ostream>
+
+
+
+
+
+namespace security {
+
 enum struct Flavor { Put, Call };
 enum struct Style { European, American };
 
-typedef int64 Id;
-typedef int64 Market;
+typedef int32_t Id;
+typedef int32_t Market;
 typedef fixed<> Strike;
 
 
 class Underlying {
  public:
-  Underlying(Id id) : id_(id) {}
-  Id id() const { return id_ };
+  Underlying(Id id, std::string name);
+  Id id();
  private:
   Id id_;
-}
+  std::string name_;
+};
 
 class Stub : Underlying {
  public:
-  
+  Stub(Id id, Underlying& parent);
  private:
   Underlying& parent_;
-}
+};
 
 class Future : Underlying {
  public:
-  
+  Future(Id id, Underlying& parent);
  private:
   Underlying& parent_;
   Term& term_;
-}
+};
 
-
+ 
+  
 class Term {
  public:
-  Term(Id id) : id_(id) {}
-  Id id() const { return id_; }
+  Term(Id id);
+  Id id();
  private:
   boost::postix_time::ptime expire_;
   boost::postix_time::ptime settle_;
   Id id_;
 }
 
-operator<< (,const Term& term) {
-  
-}
 
 
 class Option {
  public:
-  Option(const Underlying& underlying, const Term& term, Strike strike, Flavor flavor, 
-    Id id)
-    : underlying_(underlying), 
-      term_(term), 
-      strike_(strike), 
-      flavor_(flavor), 
-      id_(id) {}
-  Equity& equity() const { return equity_; }
-  Term& term() const { return term_; }
-  Strike strike() const { return strike_; }
-  Flavor flavor() const { return flavor_; }
-  Id id() const { return id_; }
+  Option(Underlying& underlying, Term& term, Strike strike, Flavor flavor, 
+    Id id);
+  Equity& equity();
+  Term& term();
+  Strike strike();
+  Flavor flavor();
+  Id id();
  private:
   Underlying& underlying_;
   Term& term_;
@@ -67,10 +72,17 @@ class Option {
   Id id_;
 };
 
-std::ostream& operator<< (std::ostream& os, const Option& option) {
   
-}
+std::string to_str(Term& term);
+std::string to_str(Option& option);
+  
+  
+std::ostream& operator<<(std::ostream& os, Underlying& underlying); 
+std::ostream& operator<<(std::ostream& os, Term& term);
+std::ostream& operator<<(std::ostream& os, Option& option);
 
+  
+  
 
 /*
  
