@@ -1,9 +1,15 @@
-enum struct Flavor { Put, Call };
-enum struct Style { European, American };
 
-typedef int64 Id;
-typedef int64 Market;
-typedef fixed<> Strike;
+
+namespace security {
+  
+Id Dividend::Id() {
+    return id_;
+}
+
+  
+  
+  
+}
 
 
 class Underlying {
