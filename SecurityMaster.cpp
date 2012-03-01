@@ -1,81 +1,87 @@
+#include <boost/format.hpp>
+
+#include "SecurityMaster.hpp"
+
+using std::string;
+using std::ostream;
+//using std::map;
 
 
 namespace security {
-  
-Id Dividend::Id() {
-    return id_;
+
+
+Dividend::Dividend(Id id, Datetime exDate, Cash cash) 
+  : ReferenceEntity(id),
+    exDate_(exDate),
+    cash_(cash) {}
+Datetime Dividend:exDate() const { 
+  return exDate_; 
+}
+Cash Dividend::cash() const {
+  return cash_;
 }
 
-  
-  
-  
+Term::Term(Id id, Datetime expire, Datetime settle) 
+  : ReferenceEntity(id),
+    expire_(expire),
+    settle_(settle) {}
+Datetime Term::expire() const {
+  return expire_;
+}
+Datetime Term::settle() const {
+  return settle_;
+}
+    
+Underlying::Underlying(Id id, const string& symbol) 
+  : ReferenceEntity(id),
+    symbol_(symbol) {}
+string Underlying::symbol() const {
+  return symbol_;
 }
 
-
-class Underlying {
- public:
-  Underlying(Id id) : id_(id) {}
-  Id id() const { return id_ };
- private:
-  Id id_;
+Stub::Stub(Id id, const string& symbol, const Underlying& parent) 
+  : Underlying(id, symbol),
+    parent_(parent) {}
+Underlying Stub::parent() const {
+  return parent_;
 }
 
-class Stub : Underlying {
- public:
-  
- private:
-  Underlying& parent_;
+Future::Future(Id id, const string& symbol, const Underlying& parent, 
+  const Term& term)
+  : Underlying(id, symbol),
+    parent_(parent),
+    term_(term) {}
+Underlying Future::parent() const {
+  return parent_;
+}
+Future::term() const {
+  return term_;
 }
 
-class Future : Underlying {
- public:
-  
- private:
-  Underlying& parent_;
-  Term& term_;
+Option::Option(Id id, const Underlying& underlying, const Term& term, 
+  Strike strike, Flavor flavor)
+  : ReferenceEntity(id),
+    underlying_(underlying), 
+    term_(term), 
+    strike_(strike), 
+    flavor_(flavor) {}   
+Underlying Option::Underlying& underlying() const { 
+  return underlying_; 
+}
+Term Option::Term& term() const { 
+  return term_;
+}
+Strike Option::Strike strike() const {
+  return strike_;
+}
+Flavor Option::Flavor flavor() const { 
+  return flavor_; 
 }
 
-
-class Term {
- public:
-  Term(Id id) : id_(id) {}
-  Id id() const { return id_; }
- private:
-  boost::postix_time::ptime expire_;
-  boost::postix_time::ptime settle_;
-  Id id_;
-}
-
-operator<< (,const Term& term) {
-  
-}
-
-
-class Option {
- public:
-  Option(const Underlying& underlying, const Term& term, Strike strike, Flavor flavor, 
-    Id id)
-    : underlying_(underlying), 
-      term_(term), 
-      strike_(strike), 
-      flavor_(flavor), 
-      id_(id) {}
-  Equity& equity() const { return equity_; }
-  Term& term() const { return term_; }
-  Strike strike() const { return strike_; }
-  Flavor flavor() const { return flavor_; }
-  Id id() const { return id_; }
- private:
-  Underlying& underlying_;
-  Term& term_;
-  Strike strike_;
-  Flavor flavor_;
-  Id id_;
-};
-
-std::ostream& operator<< (std::ostream& os, const Option& option) {
+string toString(const Option& option) {
   
 }
+
 
 
 /*
@@ -148,6 +154,7 @@ std::ostream& operator<< (std::ostream& os, const Option& option) {
 */
 
 
+/*
 map<Underlying, map<Date, Dividend>> 
 
 
@@ -172,7 +179,7 @@ class SecurityMaster {
   set<Market> market_;
   
   
-  
+*/  
   
   
 }

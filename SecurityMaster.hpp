@@ -1,9 +1,10 @@
 
 #include <cstdint>
 #include <string>
+#include <set>
 #include <ostream>
 
-
+#include "fixed.hpp"
 
 
 
@@ -14,42 +15,46 @@ enum struct Style { European, American };
 
 typedef int32_t Id;
 typedef int32_t Market;
-typedef fixed<> Strike;
-typedef fixed<> Cash;
+typedef fixed<int32_t,6> Strike;
+typedef fixed<int32_t,6> Cash;
 typedef boost::postix_time::ptime Datetime;  
-  
-class Dividend {
-public:
-  Dividend(Id id, Datetime exDate, Cash cash);
+
+class ReferenceEntity {
+ public:
+  Entity(Id id);
   Id id();
+ private:
+  Id id_;
+}
+
+class Dividend : ReferenceEntity {
+ public:
+  Dividend(Id id, Datetime exDate, Cash cash);
   Datetime exDate();
   Cash cash();
-private:
-  Id id_;
+ private:
   Datetime exDate_;
   Cash cash_;
 };
 
-class Term {
+class Term : ReferenceEntity {
  public:
   Term(Id id, Datetime expire, Datetime settle);
-  Id id();
   Datetime expire();
   Datetime settle();
  private:
-  Id id_;
   Datetime expire_;
   Datetune settle_;
 }  
   
+std::string toString(Term& term);
+  
 class Underlying {
  public:
-  Underlying(Id id, std::string name);
-  Id id();
-  std::string name();
+  Underlying(Id id, std::string& symbol);
+  std::string symbol();
  private:
-  Id id_;
-  std::string name_;
+  std::string symbol_;
 };
 
 class Stub : Underlying {
@@ -59,6 +64,8 @@ class Stub : Underlying {
   Underlying& parent_;
 };
 
+std::string toString(Underlying& underlying);
+  
 class Future : Underlying {
  public:
   Future(Id id, Underlying& parent, Term& term);
@@ -69,55 +76,44 @@ class Future : Underlying {
   Term& term_;
 };
 
-class Option {
+std::string toString(Future& future);
+
+class Option : ReferenceEntity {
  public:
-  Option(Underlying& underlying, Term& term, Strike strike, Flavor flavor, 
-    Id id);
-  Equity& equity();
+  Option(Id id, Underlying& underlying, Term& term, Strike strike, 
+    Flavor flavor);
+  Underlying& underlying();
   Term& term();
   Strike strike();
   Flavor flavor();
-  Id id();
  private:
   Underlying& underlying_;
   Term& term_;
   Strike strike_;
   Flavor flavor_;
-  Id id_;
 };
 
+std::string toString(Option& option);
 
-std::string to_str(Underlying& underlying);
-std::string to_str(Future& future);
-std::string to_str(Term& term);
-std::string to_str(Option& option);
-  
-std::ostream& operator<<(std::ostream& os, Underlying& underlying);
-std::ostream& operator<<(std::ostream& os, Future& future);
-std::ostream& operator<<(std::ostream& os, Term& term);
-std::ostream& operator<<(std::ostream& os, Option& option);
-
-  
-  
-
-
-/*
-
-class SecurityMaster {
- public:
-  SecurityMaster () {}
-    // terms per underlying
-    // strikes per (underlying,term)
-    // options per strike
- private:
-  typedef map<Equity, map<Term, map<Strike, map<Flavor, Option*>>>> OptionMap;
-  typedef map<Equity, map<Term, Future*>> FutureMap;
-  // and define iteratiors
-  set<Equity> equity_;
-  set<Option> option_;
-  set<Future> future_;
-  set<Market> market_;
+template <class T>
+std::ostream& operator<<(std::ostream& os, const T& obj);
+  os << toString(obj);
+  return os;
 }
-*/
+
+
+class Master {
+ public:
+  Master();
+ private:
+  //typedef map<Underlying,map<Term,map<Strike,map<Flavor,Option*>>>> Optionmap;
+  
+  std::set<Term> term_;
+  std::set<Underlying> underlying_;
+  std::set<Stub> stub_;
+  std::set<Future> future_;
+  std::set<Option> option_;
+};
+  
 
 }
