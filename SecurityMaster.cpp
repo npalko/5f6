@@ -1,87 +1,101 @@
 #include <boost/format.hpp>
-
 #include "SecurityMaster.hpp"
 
-using std::string;
-using std::ostream;
 //using std::map;
 
 
 namespace security {
 
 
+using std::string;
+/*
+Container<Level,T>(*underlying)
+-- isn't this just essentially a vector?
+and our security master provides indexing into it?
+
+
+Container<Underlying,T>     // underlying
+Container<Term,T>           // underlying|term
+Container<Option,T>         // underlying|term|strike|flavor
+
+subset
+ .Underlying
+ .Term
+
+
+Container<Option,T>(subset)   -- make an option Container
+-- create new each time
+-- or reference existing global Tree
+
+*/
+
+
+
 Dividend::Dividend(Id id, Datetime exDate, Cash cash) 
-  : ReferenceEntity(id),
+  : id_(id),
     exDate_(exDate),
     cash_(cash) {}
-Datetime Dividend:exDate() const { 
-  return exDate_; 
-}
-Cash Dividend::cash() const {
-  return cash_;
-}
+Id Divided::id() const { return Id_; }
+Datetime Dividend:exDate() const { return exDate_; }
+Cash Dividend::cash() const { return cash_; }
+
 
 Term::Term(Id id, Datetime expire, Datetime settle) 
-  : ReferenceEntity(id),
+  : id_(id),
     expire_(expire),
     settle_(settle) {}
-Datetime Term::expire() const {
-  return expire_;
-}
-Datetime Term::settle() const {
-  return settle_;
-}
-    
-Underlying::Underlying(Id id, const string& symbol) 
-  : ReferenceEntity(id),
-    symbol_(symbol) {}
-string Underlying::symbol() const {
-  return symbol_;
-}
+Id Term::id() const { return Id_; }    
+Datetime Term::expire() const { return expire_; }
+Datetime Term::settle() const { return settle_; }
 
+//string toString(const Underlying& underlying) {return "";}
+
+
+Underlying::Underlying(Id id, const string symbol) 
+  : id_(id),
+    symbol_(symbol) {}  
+Id Underlying::id() const { return Id_; }   
+string Underlying::symbol() const { return symbol_; }
+
+//string toString(const Underlying& underlying) {return "";}
+
+/*
 Stub::Stub(Id id, const string& symbol, const Underlying& parent) 
   : Underlying(id, symbol),
     parent_(parent) {}
-Underlying Stub::parent() const {
-  return parent_;
-}
+Underlying& Stub::parent() const { return parent_; }
+
 
 Future::Future(Id id, const string& symbol, const Underlying& parent, 
   const Term& term)
-  : Underlying(id, symbol),
+  : id_(id),
+    Underlying(id, symbol),
     parent_(parent),
     term_(term) {}
-Underlying Future::parent() const {
-  return parent_;
-}
-Future::term() const {
-  return term_;
-}
+Id Option::id() { return id_; }
+Underlying& Future::parent() const { return parent_; }
+Term& Future::term() const { return term_; }
+*/
+
+//string toString(const Future& future) {return "";}
+
 
 Option::Option(Id id, const Underlying& underlying, const Term& term, 
   Strike strike, Flavor flavor)
-  : ReferenceEntity(id),
+  : id_(id),
     underlying_(underlying), 
     term_(term), 
     strike_(strike), 
-    flavor_(flavor) {}   
-Underlying Option::Underlying& underlying() const { 
-  return underlying_; 
-}
-Term Option::Term& term() const { 
-  return term_;
-}
-Strike Option::Strike strike() const {
-  return strike_;
-}
-Flavor Option::Flavor flavor() const { 
-  return flavor_; 
-}
+    flavor_(flavor) {}
+Id Option::id() { return id_; }
+Underlying& Option::underlying() const { return underlying_; }
+Term& Option::term() const { return term_; }
+Strike Option::strike() const { return strike_; }
+Flavor Option::flavor() const { return flavor_; }
 
-string toString(const Option& option) {
-  
-}
+//string toString(const Option& option) {return "";}
 
+// bool operator<(const Option& lhs, const Option& rhs);
 
 
 /*

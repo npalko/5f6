@@ -1,33 +1,30 @@
+#ifndef SECURITY_TYPE_HPP
+#define SECURITY_TYPE_HPP
 
-#include <cstdint>
+
+//#include <cstdint>
 #include <string>
-#include <set>
-#include <ostream>
-
-#include "fixed.hpp"
+//#include <set>
+//#include <ostream>
+#include <boost/date_time/posix_time/posix_time.hpp>
+//#include "fixed.hpp"
 
 
 
 namespace security {
 
 enum struct Flavor { Put, Call };
-enum struct Style { European, American };
+enum struct Exercise { European, American };
 
-typedef int32_t Id;
-typedef int32_t Market;
-typedef fixed<int32_t,6> Strike;
-typedef fixed<int32_t,6> Cash;
-typedef boost::postix_time::ptime Datetime;  
+typedef int Id;
+typedef int Market;
+typedef int Strike;
+typedef int Cash;
+//typedef fixed<int32_t,6> Strike;
+//typedef fixed<int32_t,6> Cash;
+typedef boost::posix_time::ptime Datetime;
 
-class ReferenceEntity {
- public:
-  Entity(Id id);
-  Id id();
- private:
-  Id id_;
-}
-
-class Dividend : ReferenceEntity {
+class Dividend {
  public:
   Dividend(Id id, Datetime exDate, Cash cash);
   Datetime exDate();
@@ -37,34 +34,40 @@ class Dividend : ReferenceEntity {
   Cash cash_;
 };
 
-class Term : ReferenceEntity {
+class Term {
  public:
   Term(Id id, Datetime expire, Datetime settle);
+  Id id();
   Datetime expire();
   Datetime settle();
  private:
+  Id id_;
   Datetime expire_;
-  Datetune settle_;
-}  
+  Datetime settle_;
+};
   
-std::string toString(Term& term);
+//std::string toString(Term& term);
   
 class Underlying {
  public:
-  Underlying(Id id, std::string& symbol);
+  Underlying(Id id, std::string symbol);
+  Id id();
   std::string symbol();
  private:
+  Id id_;
   std::string symbol_;
 };
 
+/*
 class Stub : Underlying {
  public:
   Stub(Id id, Underlying& parent);
+  Underlying parent();
  private:
   Underlying& parent_;
 };
 
-std::string toString(Underlying& underlying);
+//std::string toString(Underlying& underlying);
   
 class Future : Underlying {
  public:
@@ -75,33 +78,37 @@ class Future : Underlying {
   Underlying& parent_;
   Term& term_;
 };
+*/
+//std::string toString(Future& future);
 
-std::string toString(Future& future);
-
-class Option : ReferenceEntity {
+class Option {
  public:
   Option(Id id, Underlying& underlying, Term& term, Strike strike, 
     Flavor flavor);
+  Id id();
   Underlying& underlying();
   Term& term();
   Strike strike();
   Flavor flavor();
  private:
+  Id id_;
   Underlying& underlying_;
   Term& term_;
   Strike strike_;
   Flavor flavor_;
 };
 
-std::string toString(Option& option);
+//std::string toString(Option& option);
 
+/*
 template <class T>
 std::ostream& operator<<(std::ostream& os, const T& obj);
   os << toString(obj);
   return os;
 }
+*/
 
-
+/*
 class Master {
  public:
   Master();
@@ -114,6 +121,9 @@ class Master {
   std::set<Future> future_;
   std::set<Option> option_;
 };
-  
+*/
 
 }
+
+#endif
+
