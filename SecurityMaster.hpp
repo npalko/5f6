@@ -1,41 +1,18 @@
 #ifndef SECURITY_TYPE_HPP
 #define SECURITY_TYPE_HPP
 
-//#include "fixed.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
-//#include <cstdint>
+#include <boost/cstdint.hpp>
 #include <string>
-//#include <set>
 #include <iosfwd>
-
-
-
 
 
 namespace security {
 
-typedef int Id;
-typedef int Market;
+typedef boost::int32_t Id;
+typedef boost::int32_t Market;
 typedef boost::posix_time::ptime Datetime;
 
-class Dividend {
- public:
-  typedef int Cash;
- public:
-  // add pointer to underlying
-  Dividend(Id id, Datetime exDate, Cash cash);
-  Id id() const;
-  Datetime exDate() const;
-  Cash cash() const;
- private:
-  Id id_;
-  Datetime exDate_;
-  Cash cash_;
-};
-  
-std::string str(const Dividend& dividend);  
-
-  
 class Term {
  public:
   Term(Id id, Datetime expire, Datetime settle);
@@ -50,6 +27,7 @@ class Term {
 };
   
 std::string str(const Term& term);
+std::ostream& operator<<(std::ostream& os, const Term& term);
   
   
 class Underlying {
@@ -64,8 +42,9 @@ class Underlying {
 };
   
 std::string str(const Underlying& underlying);
+std::ostream& operator<<(std::ostream& os, const Underlying& underlying);
 
-  
+
 class Stub : public Underlying {
  public:
   Stub(Id id, std::string& symbol, Underlying& parent);
@@ -75,7 +54,8 @@ class Stub : public Underlying {
 };
 
 std::string str(const Stub& stub);
-  
+std::ostream& operator<<(std::ostream& os, const Stub& stub);
+
   
 class Future : public Underlying {
  public:
@@ -89,31 +69,52 @@ class Future : public Underlying {
 
 std::string str(const Future& future);
 std::ostream& operator<<(std::ostream& os, const Future& future);
-
+  
+  
+class Dividend {
+ public:
+  typedef int Cash;
+ public:
+  Dividend(Id id, Underlying& underlying, Datetime exDate, Cash cash);
+  Id id() const;
+  Underlying& underlying() const;
+  Datetime exDate() const;
+  Cash cash() const;
+ private:
+  Id id_;
+  Underlying* underlying_;
+  Datetime exDate_;
+  Cash cash_;
+};
+  
+std::string str(const Dividend& dividend);  
+std::ostream& operator<<(std::ostream& os, const Dividend& dividend);
   
 class Option {
  public:
+  typedef int Strike;
   enum struct Flavor { Put, Call };
   enum struct Exercise { European, American };
-  typedef int Strike;
  public:
   Option(Id id, Underlying& underlying, Term& term, Strike strike, 
-    Flavor flavor);
+    Flavor flavor, Exercise exercise);
   Id id() const;
   Underlying& underlying() const;
   Term& term() const;
   Strike strike() const;
   Flavor flavor() const;
+  Exercise exercise() const;
  private:
   Id id_;
   Underlying* underlying_;
   Term* term_;
   Strike strike_;
   Flavor flavor_;
+  Exercise exercise_;
 };
 
 std::string str(const Option& option);
-
+std::ostream& operator<<(std::ostream& os, const Option& option);
 
 
   

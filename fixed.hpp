@@ -1,28 +1,18 @@
 
-#include <cstdint>
-#include <ostream>
+
+#include <boost/cstdint.hpp>
+#include <boost/operators.hpp>
+#include <iosfwd>
 #include <exception>
 
-#include <boost/operators.hpp>
 
 
 
-namespace fixed {
-  
-  
-  
-template < >
 class Decimal : boost::operators {
  public:
   Decimal() : base_(0) {
   }
-  Decimal(int x) {
-    
-  }
-  Decimal(double x)
-  
-  Decimal(const Decimal &)
-  
+
   
  private:
   Base base_;
@@ -30,4 +20,3 @@ class Decimal : boost::operators {
   
 };
   
-}
