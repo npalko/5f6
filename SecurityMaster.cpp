@@ -18,7 +18,7 @@ Dividend::Dividend(Id id, Datetime exDate, Cash cash)
     cash_(cash) {}
 Id Dividend::id() const { return id_; }
 Datetime Dividend::exDate() const { return exDate_; }
-Cash Dividend::cash() const { return cash_; }
+Dividend::Cash Dividend::cash() const { return cash_; }
 string str(const Dividend& dividend) {
   return "";
 }  
@@ -84,7 +84,7 @@ Option::Option(Id id, Underlying& underlying, Term& term, Strike strike,
 Id Option::id() const { return id_; }
 Underlying& Option::underlying() const { return *underlying_; }
 Term& Option::term() const { return *term_; }
-Strike Option::strike() const { return strike_; }
+Option::Strike Option::strike() const { return strike_; }
 Option::Flavor Option::flavor() const { return flavor_; }
 string str(const Option& option) {
   format f("%-5s %s %d%s");

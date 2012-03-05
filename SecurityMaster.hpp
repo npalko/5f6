@@ -1,14 +1,14 @@
 #ifndef SECURITY_TYPE_HPP
 #define SECURITY_TYPE_HPP
 
-
+//#include "fixed.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 //#include <cstdint>
 #include <string>
 //#include <set>
-#include <ostream>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/format.hpp>
-//#include "fixed.hpp"
+#include <iosfwd>
+
+
 
 
 
@@ -16,14 +16,13 @@ namespace security {
 
 typedef int Id;
 typedef int Market;
-typedef int Strike;
-typedef int Cash;
-//typedef fixed<int32_t,6> Strike;
-//typedef fixed<int32_t,6> Cash;
 typedef boost::posix_time::ptime Datetime;
 
 class Dividend {
  public:
+  typedef int Cash;
+ public:
+  // add pointer to underlying
   Dividend(Id id, Datetime exDate, Cash cash);
   Id id() const;
   Datetime exDate() const;
@@ -60,7 +59,6 @@ class Underlying {
   std::string symbol() const;
   std::string str() const;
  private:
-  static const boost::format format_;
   Id id_;
   std::string symbol_;
 };
@@ -97,32 +95,25 @@ class Option {
  public:
   enum struct Flavor { Put, Call };
   enum struct Exercise { European, American };
+  typedef int Strike;
+ public:
   Option(Id id, Underlying& underlying, Term& term, Strike strike, 
     Flavor flavor);
   Id id() const;
   Underlying& underlying() const;
   Term& term() const;
   Strike strike() const;
-  Option::Flavor flavor() const;
+  Flavor flavor() const;
  private:
   Id id_;
   Underlying* underlying_;
   Term* term_;
   Strike strike_;
-  Option::Flavor flavor_;
+  Flavor flavor_;
 };
 
 std::string str(const Option& option);
 
-
-/*
-template <class T>
-std::ostream& operator<<(std::ostream& os, const T& obj) {
-  os << toString(obj);
-  return os;
-}
-*/
-  
 
 
   
