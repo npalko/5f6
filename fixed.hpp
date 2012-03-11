@@ -11,7 +11,6 @@
 #include <boost/operators.hpp>
 #include <iosfwd>
 #include <iomanip>
-#include <sstream>
 
 
 namespace fixed {
@@ -110,13 +109,10 @@ std::ostream& operator<<(std::ostream& os, const Fixed<T,N>& f) {
   os << std::setprecision(N) << std::fixed << static_cast<double>(f);
   return os;
 };
-// std::instream here? 
 
 
-typedef Fixed<boost::int32_t,4> Fixed4Int32_t;
-typedef Fixed<boost::int32_t,6> Fixed6Int32_t;
-  
-
+typedef Fixed<boost::int32_t,4> Fixed4Int32;
+typedef Fixed<boost::int32_t,6> Fixed6Int32;
 }
 
 #endif
