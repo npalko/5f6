@@ -1,4 +1,4 @@
-#include "SecurityMaster.hpp"
+#include "asset.hpp"
 #include <boost/date_time.hpp>
 #include <boost/format.hpp>
 
@@ -7,30 +7,21 @@ using std::string;
 using std::ostream;
 using boost::format;
 using boost::gregorian::to_iso_extended_string;
-using boost::posix_time::time_from_string;
 
-namespace security {
+
+namespace asset {
 
 // Term 
 
-Term::Term(Id id, Datetime expire, Datetime settle) 
+Term::Term(Id id, Datetime expire) 
   : id_(id),
-    expire_(expire),
-    settle_(settle) {}
-Term::Term(Id id, const string& expire, const string& settle) 
-  : id_(id),
-    expire_(time_from_string(expire)),
-    settle_(time_from_string(settle)) {}
-Id Term::id() const { 
+    expire_(expire) {}
+inline Id Term::id() const { 
   return id_; 
 }    
-Datetime Term::expire() const { 
+inline Datetime Term::expire() const { 
   return expire_; 
 }
-Datetime Term::settle() const { 
-  return settle_; 
-}
-
 string str(const Term& term) {
   format f("%1% (%2%)");
   f % to_iso_extended_string(term.expire().date()) % term.id();
@@ -46,13 +37,12 @@ ostream& operator<<(ostream& os, const Term& term) {
 Underlying::Underlying(Id id, const string& symbol) 
   : id_(id),
     symbol_(symbol) {} 
-Id Underlying::id() const { 
+inline Id Underlying::id() const { 
   return id_; 
 }   
-string Underlying::symbol() const { 
+inline string Underlying::symbol() const { 
   return symbol_; 
-}
-
+		}
 string str(const Underlying& underlying) {
   format f("%1% (%2%)");
   f % underlying.id() % underlying.symbol();
@@ -68,10 +58,9 @@ ostream& operator<<(ostream& os, const Underlying& underlying) {
 Stub::Stub(Id id, string& symbol, Underlying& parent) 
   : Underlying(id, symbol),
     parent_(&parent) {}
-Underlying& Stub::parent() const { 
+inline const Underlying& Stub::parent() const { 
   return *parent_; 
 }
-
 string str(const Stub& stub) {
   return "";
   }
@@ -82,17 +71,16 @@ ostream& operator<<(ostream& os, const Stub& stub) {
 
 // Future 
 
-Future::Future(Id id, const string& symbol,  Underlying& parent, Term& term)
+Future::Future(Id id, const string& symbol, Underlying& parent, Term& term)
   : Underlying(id, symbol),
     parent_(&parent),
     term_(&term) {}
-Underlying& Future::parent() const { 
+inline const Underlying& Future::parent() const { 
   return *parent_; 
 }
-Term& Future::term() const { 
+inline const Term& Future::term() const { 
   return *term_; 
 }
-
 string str(const Future& future) {
   format f("%1% %2% (%3%)");
   f % future.symbol();
@@ -115,7 +103,7 @@ Dividend::Dividend(Id id, Underlying& underlying, Datetime exDate, Cash cash)
 Id Dividend::id() const { 
   return id_; 
 }
-Underlying& Dividend::underlying() const {
+inline const Underlying& Dividend::underlying() const {
   return *underlying_;
 }
 Datetime Dividend::exDate() const { 
@@ -124,7 +112,6 @@ Datetime Dividend::exDate() const {
 Dividend::Cash Dividend::cash() const { 
   return cash_; 
 }
-
 string str(const Dividend& dividend) {
   return "";
 }  
@@ -136,28 +123,26 @@ ostream& operator<<(ostream& os, const Dividend& dividend) {
 // Option
 
 Option::Option(Id id, Underlying& underlying, Term& term, Strike strike, 
-  Flavor flavor, Exercise exercise)
+  Flavor flavor)
   : id_(id),
     underlying_(&underlying), 
     term_(&term), 
     strike_(strike), 
-    flavor_(flavor),
-    exercise_(exercise) {}
-Id Option::id() const { 
+    flavor_(flavor) {}
+inline Id Option::id() const { 
   return id_; }
-Underlying& Option::underlying() const { 
+inline const Underlying& Option::underlying() const { 
   return *underlying_; 
 }
-Term& Option::term() const { 
+inline const Term& Option::term() const { 
   return *term_; 
 }
-Option::Strike Option::strike() const { 
+inline Option::Strike Option::strike() const { 
   return strike_; 
 }
-Option::Flavor Option::flavor() const { 
+inline Option::Flavor Option::flavor() const { 
   return flavor_; 
 }
-
 string str(const Option& option) {
   format f("%-5s %s %d%s");
   f % option.underlying().symbol();

@@ -1,29 +1,29 @@
-#ifndef SECURITY_TYPE_HPP
-#define SECURITY_TYPE_HPP
+#ifndef ASSET_HPP
+#define ASSET_HPP
+
+#include "fixed/fixed.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/cstdint.hpp>
 #include <string>
 #include <iosfwd>
+#include <vector>
 
 
-namespace security {
+namespace asset {
 
+/** Immutable surrogate identity for every entity in the system */
 typedef boost::int32_t Id;
-typedef boost::int32_t Market;
 typedef boost::posix_time::ptime Datetime;
 
 class Term {
  public:
-  Term(Id id, Datetime expire, Datetime settle);
-  Term(Id id, const std::string& expire, const std::string& settle);
+  Term(Id id, Datetime expire);
   Id id() const;
   Datetime expire() const;
-  Datetime settle() const;
  private:
   Id id_;
   Datetime expire_;
-  Datetime settle_;
 };
   
 std::string str(const Term& term);
@@ -35,7 +35,6 @@ class Underlying {
   Underlying(Id id, const std::string& symbol);
   Id id() const;
   std::string symbol() const;
-  std::string str() const;
  private:
   Id id_;
   std::string symbol_;
@@ -48,7 +47,7 @@ std::ostream& operator<<(std::ostream& os, const Underlying& underlying);
 class Stub : public Underlying {
  public:
   Stub(Id id, std::string& symbol, Underlying& parent);
-  Underlying& parent() const;
+  const Underlying& parent() const;
  private:
   Underlying* parent_;
 };
@@ -60,8 +59,8 @@ std::ostream& operator<<(std::ostream& os, const Stub& stub);
 class Future : public Underlying {
  public:
   Future(Id id, const std::string& symbol, Underlying& parent, Term& term);
-  Underlying& parent() const;
-  Term& term() const;
+  const Underlying& parent() const;
+  const Term& term() const;
  private:
   Underlying* parent_;
   Term* term_;
@@ -73,11 +72,11 @@ std::ostream& operator<<(std::ostream& os, const Future& future);
   
 class Dividend {
  public:
-  typedef int Cash;
+  typedef fixed::int32p6_t Cash;
  public:
   Dividend(Id id, Underlying& underlying, Datetime exDate, Cash cash);
   Id id() const;
-  Underlying& underlying() const;
+  const Underlying& underlying() const;
   Datetime exDate() const;
   Cash cash() const;
  private:
@@ -89,49 +88,69 @@ class Dividend {
   
 std::string str(const Dividend& dividend);  
 std::ostream& operator<<(std::ostream& os, const Dividend& dividend);
-  
+
+/** 
+ */
+
 class Option {
  public:
-  typedef int Strike;
+  typedef fixed::int32p4_t Strike;
+  typedef fixed::int32p4_t Delivery;
   enum struct Flavor { Put, Call };
   enum struct Exercise { European, American };
  public:
+  /** 
+   @param id
+   @param underlying
+   @param term
+   @param strike
+   @param flavor 
+   */
   Option(Id id, Underlying& underlying, Term& term, Strike strike, 
-    Flavor flavor, Exercise exercise);
+    Flavor flavor);
   Id id() const;
-  Underlying& underlying() const;
-  Term& term() const;
+  const Underlying& underlying() const;
+  const Term& term() const;
   Strike strike() const;
   Flavor flavor() const;
-  Exercise exercise() const;
  private:
   Id id_;
   Underlying* underlying_;
   Term* term_;
   Strike strike_;
   Flavor flavor_;
-  Exercise exercise_;
 };
 
 std::string str(const Option& option);
+//std::string osi(const Option& option);
 std::ostream& operator<<(std::ostream& os, const Option& option);
 
 
-  
-/*
-class Master {
+template<class T>
+class TermTree {
  public:
-  Master();
+ private:
+  std::vector<Term> term_;
+  std::vector<Underlying> underlying_;
+  std::vector<Stub> stub_;
+  std::vector<Future> future_;
+  std::vector<T> data_;
+};
+
+template<class T>
+class OptionTree {
+ public:
+  //Tree() 
  private:
   //typedef map<Underlying,map<Term,map<Strike,map<Flavor,Option*>>>> Optionmap;
-  
-  std::set<Term> term_;
-  std::set<Underlying> underlying_;
-  std::set<Stub> stub_;
-  std::set<Future> future_;
-  std::set<Option> option_;
+  std::vector<Term> term_;
+  std::vector<Underlying> underlying_;
+  std::vector<Stub> stub_;
+  std::vector<Future> future_;
+  std::vector<Option> option_;
+  std::vector<T> data_;
 };
-*/
+
 
 }
 
